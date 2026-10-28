@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1020">
+  <title>TechTalk — Comunidade de Tecnologia</title>
+  <style>
+    :root {
+      --bg: #0b1020; --panel: #121a2e; --panel2: #17213a; --line: #283451;
+      --text: #edf2ff; --muted: #a2aec9; --accent: #8b5cf6; --accent2: #22d3ee;
+      --danger: #fb7185; --success: #34d399;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; background: radial-gradient(circle at 80% 0%, #1d2450 0, var(--bg) 35%); color: var(--text); min-height: 100vh; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { position: sticky; top: 0; z-index: 5; background: rgba(11,16,32,.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line); }
+    .top-inner { max-width: 1200px; margin: auto; padding: 15px 22px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 850; font-size: 1.22rem; letter-spacing: -.5px; }
+    .brand-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: white; font-size: 1.2rem; }
+    .brand span:last-child { color: var(--accent2); }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .user-chip { color: var(--muted); font-size: .9rem; }
+    .layout { max-width: 1200px; margin: 28px auto; padding: 0 22px 40px; display: grid; grid-template-columns: 230px minmax(0,1fr) 240px; gap: 22px; }
+    .sidebar, .panel, .post-card, .composer { background: rgba(18,26,46,.92); border: 1px solid var(--line); border-radius: 18px; }
+    .sidebar { padding: 18px; height: fit-content; position: sticky; top: 85px; }
+    .eyebrow { text-transform: uppercase; font-size: .72rem; letter-spacing: 1.4px; font-weight: 800; color: var(--accent2); margin: 0 0 14px; }
+    .nav-list { display: grid; gap: 7px; }
+    .nav-btn { width: 100%; text-align: left; padding: 11px 12px; border: 1px solid transparent; background: transparent; color: var(--muted); border-radius: 11px; }
+    .nav-btn:hover, .nav-btn.active { background: #202a48; color: var(--text); border-color: #344263; }
+    .side-note { margin-top: 22px; padding: 13px; border-radius: 13px; background: linear-gradient(145deg,rgba(139,92,246,.16),rgba(34,211,238,.07)); color: var(--muted); font-size: .83rem; line-height: 1.5; }
+    .main { min-width: 0; }
+    .hero { padding: 26px; border: 1px solid #3b3971; border-radius: 20px; background: linear-gradient(115deg,rgba(139,92,246,.22),rgba(34,211,238,.08)); margin-bottom: 18px; }
+    .hero h1 { margin: 0 0 9px; font-size: clamp(1.65rem,3vw,2.35rem); letter-spacing: -1.1px; }
+    .hero p { color: var(--muted); margin: 0; line-height: 1.6; max-width: 620px; }
+    .composer { padding: 17px; margin-bottom: 18px; }
+    .composer-top { display: flex; align-items: center; gap: 12px; margin-bottom: 13px; }
+    .avatar { flex: 0 0 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; font-weight: 800; color: white; background: linear-gradient(135deg,var(--accent),#4361ee); }
+    .avatar.small { flex-basis: 34px; height: 34px; border-radius: 11px; font-size: .85rem; }
+    textarea, input, select { color: var(--text); background: #0c1326; border: 1px solid #303d5d; border-radius: 11px; outline: none; width: 100%; padding: 12px 13px; }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(34,211,238,.1); }
+    textarea { min-height: 95px; resize: vertical; }
+    .composer-tools { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+    .media-field { margin: 12px 0; }
+    .media-field label { display:block; margin-bottom:7px; color:#cbd5e1; font-size:.88rem; }
+    input[type="file"] { padding:10px; }
+    .media-preview { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin-top:10px; }
+    .media-preview img, .media-preview video { width:100%; max-height:180px; object-fit:cover; border-radius:10px; border:1px solid var(--line); }
+    .media-editor { background:#0c1326; border:1px solid var(--line); border-radius:12px; padding:10px; min-width:0; }
+    .media-editor img, .media-editor video { width:100%; height:155px; object-fit:contain; background:#080d19; border-radius:8px; }
+    .remove-media { width:100%; margin-bottom:8px; padding:7px 10px; font-size:.82rem; }
+    .edit-controls { display:grid; gap:8px; margin-top:9px; }
+    .edit-controls select { padding:8px; }
+    .edit-controls label { font-size:.78rem; color:var(--muted); }
+    .rotate-row { display:flex; gap:6px; }
+    .rotate-row .btn { flex:1; padding:7px 8px; font-size:.8rem; }
+    .post-media { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-top:13px; }
+    .post-media img, .post-media video { display:block; width:100%; max-height:420px; object-fit:contain; background:#080d19; border-radius:12px; border:1px solid var(--line); }
+    .post-location { color:var(--accent2); font-size:.85rem; margin-top:5px; }
+    .composer-tools select { max-width: 185px; }
+    .btn { border: 0; border-radius: 11px; padding: 10px 15px; color: white; background: linear-gradient(100deg,var(--accent),#6366f1); font-weight: 750; transition: transform .15s, filter .15s; }
+    .btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+    .btn.secondary { background: #202a45; border: 1px solid #344263; color: var(--text); }
+    .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+    .btn.danger { background: #421d32; color: #fecdd3; border: 1px solid #7f2948; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .feed-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 2px 12px; }
+    .feed-head h2 { font-size: 1.1rem; margin: 0; }
+    .search { max-width: 230px; }
+    .post-card { padding: 18px; margin-bottom: 13px; }
+    .post-head { display: flex; align-items: flex-start; gap: 11px; }
+    .post-meta { min-width: 0; flex: 1; }
+    .post-author { font-weight: 750; }
+    .post-date { color: var(--muted); font-size: .8rem; margin-top: 3px; }
+    .tag { display: inline-flex; margin-top: 9px; border: 1px solid #3b3971; color: #c4b5fd; background: rgba(139,92,246,.12); border-radius: 99px; padding: 4px 9px; font-size: .75rem; }
+    .post-title { font-size: 1.12rem; margin: 15px 0 8px; line-height: 1.35; }
+    .post-body { color: #c5cde0; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .post-actions { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--line); padding-top: 13px; margin-top: 15px; }
+    .action { border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--muted); padding: 7px 10px; }
+    .action:hover, .action.liked { background: #202a45; color: var(--accent2); border-color: #344263; }
+    .comments { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .comment { display: flex; gap: 9px; margin: 12px 0; }
+    .comment-text { background: #0c1326; border: 1px solid #202c48; padding: 10px 12px; border-radius: 12px; color: #cbd5e1; flex: 1; overflow-wrap: anywhere; }
+    .comment-text strong { display: block; color: var(--text); font-size: .85rem; margin-bottom: 4px; }
+    .comment-form { display: flex; gap: 8px; margin-top: 12px; }
+    .comment-form input { min-width: 0; }
+    .right-col { display: grid; align-content: start; gap: 15px; }
+    .panel { padding: 18px; }
+    .panel h3 { font-size: .98rem; margin: 0 0 14px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat { background: #0c1326; border: 1px solid #202c48; border-radius: 12px; padding: 12px; }
+    .stat strong { display: block; font-size: 1.35rem; }
+    .stat span { color: var(--muted); font-size: .76rem; }
+    .topic { display: flex; justify-content: space-between; gap: 8px; color: #cbd5e1; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: .88rem; }
+    .topic:last-child { border-bottom: 0; }
+    .topic span:last-child { color: var(--muted); }
+    .muted { color: var(--muted); }
+    .empty { text-align: center; color: var(--muted); padding: 36px 15px; border: 1px dashed #35415e; border-radius: 16px; }
+    .footer { color: #7784a3; font-size: .78rem; text-align: center; padding: 20px; }
+    .hidden { display: none !important; }
+    .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(3,7,18,.78); backdrop-filter: blur(10px); }
+    .auth-card { width: min(440px,100%); padding: 28px; border-radius: 22px; border: 1px solid #394567; background: #111a30; box-shadow: 0 24px 90px #0008; }
+    .auth-card .brand { margin-bottom: 24px; }
+    .auth-card h1 { font-size: 1.7rem; margin: 0 0 8px; }
+    .auth-card p { color: var(--muted); line-height: 1.5; margin: 0 0 20px; }
+    .field { margin: 13px 0; }
+    .field label { display: block; margin-bottom: 7px; font-size: .88rem; color: #cbd5e1; }
+    .auth-card .btn { width: 100%; margin-top: 8px; }
+    .auth-switch { text-align: center; color: var(--muted); font-size: .88rem; margin-top: 17px; }
+    .link-btn { border: 0; background: none; color: var(--accent2); font-weight: 700; padding: 0 4px; }
+    .notice { padding: 10px 12px; border-radius: 10px; margin: 12px 0; font-size: .88rem; line-height: 1.4; }
+    .notice.error { background: #3d1d2c; color: #fecdd3; border: 1px solid #7f2948; }
+    .notice.info { background: #132b3c; color: #a5f3fc; border: 1px solid #155e75; }
+    .demo-warning { font-size: .77rem !important; margin-top: 18px !important; padding-top: 14px; border-top: 1px solid var(--line); }
+    @media (max-width: 1000px) { .layout { grid-template-columns: 205px minmax(0,1fr); } .right-col { grid-column: 2; grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 700px) {
+      .top-inner { padding: 12px 15px; } .layout { display: block; padding: 0 14px 30px; margin-top: 16px; }
+      .sidebar { position: static; margin-bottom: 14px; padding: 12px; }
+      .nav-list { display: flex; overflow-x: auto; } .nav-btn { white-space: nowrap; width: auto; }
+      .side-note { display: none; } .right-col { display: grid; grid-template-columns: 1fr 1fr; margin-top: 14px; }
+      .hero { padding: 20px; } .search { max-width: 145px; } .composer-tools { flex-wrap: wrap; }
+      .composer-tools select { max-width: none; flex: 1 1 150px; } .composer-tools .btn { flex: 1; }
+      .user-chip { display: none; }
+    }
+    @media (max-width: 430px) { .right-col { grid-template-columns: 1fr; } .feed-head { align-items: stretch; flex-direction: column; } .search { max-width: none; } .hero h1 { font-size: 1.7rem; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="top-inner">
+      <div class="brand"><div class="brand-mark">⌘</div><div>Tech<span>Talk</span></div></div>
+      <div class="top-actions">
+        <span class="user-chip" id="userChip">Participando como Visitante</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <p class="eyebrow">Comunidade</p>
+      <nav class="nav-list" id="categoryNav" aria-label="Filtrar por categoria">
+        <button class="nav-btn active" data-category="Todas">✦ Todas as discussões</button>
+        <button class="nav-btn" data-category="Inteligência Artificial">✧ Inteligência Artificial</button>
+        <button class="nav-btn" data-category="Programação">⌘ Programação</button>
+        <button class="nav-btn" data-category="Hardware">▣ Hardware</button>
+        <button class="nav-btn" data-category="Games">◈ Games</button>
+        <button class="nav-btn" data-category="Segurança Digital">⬡ Segurança Digital</button>
+        <button class="nav-btn" data-category="Carreira">↗ Carreira em TI</button>
+      </nav>
+      <div class="side-note"><strong>💡 Espaço para aprender.</strong><br>Compartilhe experiências, faça perguntas e respeite diferentes opiniões. Boas conversas começam com respeito.</div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <p class="eyebrow">Ideias conectam pessoas</p>
+        <h1>O futuro da tecnologia começa na conversa.</h1>
+        <p>Descubra novidades, tire dúvidas e compartilhe conhecimento com pessoas que também são apaixonadas por tecnologia. Sem cadastro e sem senha.</p>
+      </section>
+
+      <section class="composer" id="composer">
+        <div class="composer-top">
+          <div class="avatar" id="composerAvatar">?</div>
+          <div><strong id="composerGreeting">Participe da conversa</strong><div class="muted" style="font-size:.83rem;margin-top:3px">O que você gostaria de discutir hoje?</div></div>
+        </div>
+        <form id="postForm">
+          <div class="field"><input id="postTitle" maxlength="100" placeholder="Título (opcional)" aria-label="Título da publicação"></div>
+          <div class="field"><textarea id="postBody" maxlength="3000" placeholder="Escreva uma legenda para sua foto ou vídeo, ou compartilhe uma ideia..." aria-label="Legenda da publicação"></textarea></div>
+          <div class="field">
+            <input id="postLocation" list="worldLocations" maxlength="160" placeholder="📍 Buscar um local ou digitar um endereço" aria-label="Local da publicação">
+            <datalist id="worldLocations">
+              <option value="Belo Horizonte, Brasil"></option><option value="Contagem, Brasil"></option><option value="São Paulo, Brasil"></option><option value="Rio de Janeiro, Brasil"></option><option value="Brasília, Brasil"></option><option value="Salvador, Brasil"></option><option value="Curitiba, Brasil"></option><option value="Porto Alegre, Brasil"></option><option value="Recife, Brasil"></option><option value="Manaus, Brasil"></option><option value="Lisboa, Portugal"></option><option value="Porto, Portugal"></option><option value="Madrid, Espanha"></option><option value="Barcelona, Espanha"></option><option value="Paris, França"></option><option value="Londres, Reino Unido"></option><option value="Roma, Itália"></option><option value="Milão, Itália"></option><option value="Berlim, Alemanha"></option><option value="Amsterdã, Países Baixos"></option><option value="Zurique, Suíça"></option><option value="Atenas, Grécia"></option><option value="Istambul, Turquia"></option><option value="Nova York, Estados Unidos"></option><option value="Los Angeles, Estados Unidos"></option><option value="Miami, Estados Unidos"></option><option value="Orlando, Estados Unidos"></option><option value="Chicago, Estados Unidos"></option><option value="Toronto, Canadá"></option><option value="Vancouver, Canadá"></option><option value="Cidade do México, México"></option><option value="Cancún, México"></option><option value="Buenos Aires, Argentina"></option><option value="Santiago, Chile"></option><option value="Lima, Peru"></option><option value="Bogotá, Colômbia"></option><option value="Tóquio, Japão"></option><option value="Osaka, Japão"></option><option value="Seul, Coreia do Sul"></option><option value="Pequim, China"></option><option value="Xangai, China"></option><option value="Hong Kong"></option><option value="Singapura"></option><option value="Bangkok, Tailândia"></option><option value="Dubai, Emirados Árabes Unidos"></option><option value="Mumbai, Índia"></option><option value="Sydney, Austrália"></option><option value="Melbourne, Austrália"></option><option value="Auckland, Nova Zelândia"></option><option value="Cairo, Egito"></option><option value="Cidade do Cabo, África do Sul"></option>
+            </datalist>
+            <div class="muted" style="font-size:.78rem;margin:6px 2px 0">Escolha uma sugestão ou digite qualquer local. A lista é uma seleção de lugares populares do mundo.</div>
+          </div>
+          <div class="media-field">
+            <label for="postMedia">📷 Adicionar fotos e/ou vídeos (até 3 arquivos; máximo total de 2,5 MB)</label>
+            <input id="postMedia" type="file" accept="image/*,video/*" multiple aria-label="Selecionar fotos e vídeos">
+            <div id="mediaPreview" class="media-preview"></div>
+            <div class="muted" style="font-size:.8rem;margin-top:8px">🖼️ Nas fotos, você pode girar, ajustar brilho e escolher um filtro antes de publicar. Os vídeos podem ser pré-visualizados.</div>
+          </div>
+          <div class="composer-tools">
+            <select id="postCategory" aria-label="Categoria da publicação">
+              <option>Inteligência Artificial</option><option>Programação</option><option>Hardware</option><option>Games</option><option>Segurança Digital</option><option>Carreira</option><option>Outros</option>
+            </select>
+            <span class="muted" id="charCount" style="font-size:.8rem">0/3000</span>
+            <button class="btn" type="submit">＋ Publicar</button>
+          </div>
+        </form>
+        <div class="notice info">Você pode publicar sem criar uma conta. As publicações exibem automaticamente a data e a hora. Fotos e vídeos ficam salvos neste navegador.</div>
+      </section>
+
+      <div class="feed-head">
+        <h2 id="feedTitle">Discussões da comunidade</h2>
+        <input class="search" id="searchInput" placeholder="⌕ Buscar discussões..." aria-label="Buscar discussões">
+      </div>
+      <section id="feed" aria-live="polite"></section>
+      <div class="footer">TechTalk • Compartilhe conhecimento. Construa o futuro.</div>
+    </main>
+
+    <aside class="right-col">
+      <section class="panel">
+        <h3>📊 Comunidade em números</h3>
+        <div class="stat-grid">
+          <div class="stat"><strong id="statPosts">0</strong><span>Publicações</span></div>
+          <div class="stat"><strong id="statComments">0</strong><span>Comentários</span></div>
+        </div>
+      </section>
+      <section class="panel">
+        <h3>🔥 Temas em destaque</h3>
+        <div class="topic"><span>Inteligência Artificial</span><span>IA</span></div>
+        <div class="topic"><span>Programação</span><span>DEV</span></div>
+        <div class="topic"><span>Hardware</span><span>PC</span></div>
+        <div class="topic"><span>Segurança Digital</span><span>SEC</span></div>
+      </section>
+      <section class="panel">
+        <h3>🤝 Código da comunidade</h3>
+        <p class="muted" style="font-size:.86rem;line-height:1.6;margin:0">Seja respeitoso, dê crédito às fontes, evite divulgar dados pessoais e mantenha os debates construtivos.</p>
+      </section>
+    </aside>
+  </div>
+
+
+  <script>
+    const STORAGE_POSTS = "techtalk_demo_posts_v1";
+    const anonymousId = (() => {
+      let id = localStorage.getItem("techtalk_anonymous_id_v1");
+      if (!id) {
+        id = "visitor_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+        localStorage.setItem("techtalk_anonymous_id_v1", id);
+      }
+      return id;
+    })();
+    let currentUser = { id: anonymousId, name: "Visitante" };
+    let activeCategory = "Todas";
+    let expandedComments = new Set();
+
+    const $ = (id) => document.getElementById(id);
+    const escapeHTML = (value) => String(value).replace(/[&<>"']/g, ch => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    }[ch]));
+    const initials = (name) => (name || "?").trim().split(/\s+/).slice(0,2).map(p => p[0]).join("").toUpperCase();
+    const read = (key, fallback) => {
+      try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; }
+      catch { return fallback; }
+    };
+    const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+    const getPosts = () => read(STORAGE_POSTS, []);
+    function formatDate(timestamp) {
+      return new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(timestamp));
+    }
+    function seedPosts() {
+      if (getPosts().length) return;
+      const now = Date.now();
+      write(STORAGE_POSTS, [
+        { id: "seed_ai", userId: "community", author: "Marina", title: "Como a IA pode ajudar quem está aprendendo programação?", body: "Estou começando a estudar programação. Quais são boas formas de usar IA para aprender sem depender dela para tudo?", category: "Inteligência Artificial", createdAt: now - 3600000, likes: [], comments: [] },
+        { id: "seed_js", userId: "community", author: "Lucas", title: "Dicas para aprender JavaScript", body: "Quais projetos pequenos vocês recomendam para praticar variáveis, funções e eventos?", category: "Programação", createdAt: now - 7200000, likes: [], comments: [] },
+        { id: "seed_pc", userId: "community", author: "Bia", title: "O que priorizar em um PC para jogos?", body: "Na hora de montar um PC, como equilibrar placa de vídeo, processador e memória RAM?", category: "Hardware", createdAt: now - 10800000, likes: [], comments: [] }
+      ]);
+    }
+
+    function updateHeader() {
+      $("userChip").textContent = "Participando como Visitante";
+      $("composerGreeting").textContent = "Olá, visitante!";
+      $("composerAvatar").textContent = "V";
+      $("postTitle").disabled = false;
+      $("postBody").disabled = false;
+      $("postCategory").disabled = false;
+      $("postForm").querySelector("button[type=submit]").disabled = false;
+    }
+
+    function renderPosts() {
+      const allPosts = getPosts().sort((a,b) => b.createdAt - a.createdAt);
+      const query = $("searchInput").value.trim().toLocaleLowerCase("pt-BR");
+      const posts = allPosts.filter(post => {
+        const categoryMatch = activeCategory === "Todas" || post.category === activeCategory;
+        const text = `${post.title} ${post.body} ${post.author} ${post.category}`.toLocaleLowerCase("pt-BR");
+        return categoryMatch && text.includes(query);
+      });
+      $("feedTitle").textContent = activeCategory === "Todas" ? "Discussões da comunidade" : activeCategory;
+      $("statPosts").textContent = allPosts.length;
+      $("statComments").textContent = allPosts.reduce((sum, p) => sum + (p.comments || []).length, 0);
+      if (!posts.length) {
+        $("feed").innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:8px">⌕</div><strong>Nenhuma discussão encontrada</strong><p>Tente outra pesquisa ou seja a primeira pessoa a publicar sobre este assunto.</p></div>';
+        return;
+      }
+      $("feed").innerHTML = posts.map(post => {
+        const liked = currentUser && (post.likes || []).includes(currentUser.id);
+        const comments = post.comments || [];
+        const expanded = expandedComments.has(post.id);
+        const commentsHTML = expanded ? `
+          <div class="comments">
+            ${comments.length ? comments.map(comment => `<div class="comment"><div class="avatar small">${escapeHTML(initials(comment.author))}</div><div class="comment-text"><strong>${escapeHTML(comment.author)}</strong>${escapeHTML(comment.text)}</div></div>`).join("") : '<p class="muted" style="font-size:.88rem">Ainda não há comentários. Comece o debate!</p>'}
+            <form class="comment-form" data-comment-form="${escapeHTML(post.id)}">
+              <input name="comment" maxlength="800" placeholder="Escreva um comentário..." aria-label="Escreva um comentário" required>
+              <button class="btn secondary" type="submit">Enviar</button>
+            </form>
+          </div>` : "";
+        return `<article class="post-card">
+          <div class="post-head"><div class="avatar">${escapeHTML(initials(post.author))}</div><div class="post-meta"><div class="post-author">${escapeHTML(post.author)}</div><div class="post-date">${formatDate(post.createdAt)}</div><span class="tag">${escapeHTML(post.category)}</span></div>
+        </div>
+          ${post.title ? `<h3 class="post-title">${escapeHTML(post.title)}</h3>` : ""}
+          ${post.location ? `<div class="post-location">📍 ${escapeHTML(post.location)}</div>` : ""}
+          ${post.body ? `<div class="post-body" style="margin-top:10px">${escapeHTML(post.body)}</div>` : ""}
+          ${(post.media || []).length ? `<div class="post-media">${post.media.map(media => media.type === "video" ? `<video controls preload="metadata" src="${escapeHTML(media.data)}"></video>` : `<img src="${escapeHTML(media.data)}" alt="Foto publicada na comunidade" loading="lazy">`).join("")}</div>` : ""}
+          <div class="post-actions">
+            <button class="action ${liked ? "liked" : ""}" data-like="${escapeHTML(post.id)}">${liked ? "♥" : "♡"} ${post.likes?.length || 0} curtidas</button>
+            <button class="action" data-comments="${escapeHTML(post.id)}">▤ ${comments.length} comentários</button>
+          </div>
+          ${commentsHTML}
+        </article>`;
+      }).join("");
+    }
+
+    $("postBody").addEventListener("input", () => $("charCount").textContent = `${$("postBody").value.length}/3000`);
+
+    let selectedMediaFiles = [];
+    let mediaEdits = [];
+
+    function readMediaFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ type: file.type.startsWith("video/") ? "video" : "image", data: reader.result, name: file.name });
+        reader.onerror = () => reject(new Error("Não foi possível ler o arquivo selecionado."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function filterCss(edit) {
+      const filters = { original: "none", vivid: "saturate(1.45) contrast(1.08)", grayscale: "grayscale(1)", sepia: "sepia(.75)" };
+      return `${filters[edit.filter] || "none"} brightness(${edit.brightness}%)`;
+    }
+
+    function updateEditorPreview(index) {
+      const edit = mediaEdits[index];
+      const image = document.querySelector(`[data-edit-image="${index}"]`);
+      if (image && edit) {
+        image.style.filter = filterCss(edit);
+        image.style.transform = `rotate(${edit.rotation}deg)`;
+      }
+    }
+
+    function renderMediaEditors() {
+      const preview = $("mediaPreview");
+      preview.innerHTML = "";
+      selectedMediaFiles.forEach((file, index) => {
+        const card = document.createElement("div");
+        card.className = "media-editor";
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "btn danger remove-media";
+        removeButton.textContent = "✕ Remover arquivo";
+        removeButton.setAttribute("aria-label", `Remover ${file.name} da publicação`);
+        removeButton.addEventListener("click", () => {
+          selectedMediaFiles.splice(index, 1);
+          mediaEdits.splice(index, 1);
+          renderMediaEditors();
+        });
+        card.appendChild(removeButton);
+        const url = URL.createObjectURL(file);
+        if (file.type.startsWith("video/")) {
+          const video = document.createElement("video");
+          video.src = url; video.controls = true; video.preload = "metadata";
+          card.appendChild(video);
+          const label = document.createElement("div"); label.className = "muted"; label.style.cssText = "font-size:.78rem;margin-top:7px"; label.textContent = `Vídeo: ${file.name}`; card.appendChild(label);
+        } else {
+          const image = document.createElement("img");
+          image.src = url; image.alt = file.name; image.dataset.editImage = String(index); card.appendChild(image);
+          const controls = document.createElement("div"); controls.className = "edit-controls";
+          const rotateRow = document.createElement("div"); rotateRow.className = "rotate-row";
+          [-90, 90].forEach(degrees => {
+            const button = document.createElement("button"); button.type = "button"; button.className = "btn secondary";
+            button.textContent = degrees < 0 ? "↶ Girar" : "↷ Girar";
+            button.addEventListener("click", () => { mediaEdits[index].rotation = (mediaEdits[index].rotation + degrees + 360) % 360; updateEditorPreview(index); });
+            rotateRow.appendChild(button);
+          });
+          controls.appendChild(rotateRow);
+          const filterLabel = document.createElement("label"); filterLabel.textContent = "Filtro";
+          const filterSelect = document.createElement("select");
+          [["original","Original"],["vivid","Vivo"],["grayscale","Preto e branco"],["sepia","Sépia"]].forEach(([value,label]) => { const option = document.createElement("option"); option.value=value; option.textContent=label; filterSelect.appendChild(option); });
+          filterSelect.value = mediaEdits[index].filter;
+          filterSelect.addEventListener("change", () => { mediaEdits[index].filter = filterSelect.value; updateEditorPreview(index); });
+          filterLabel.appendChild(filterSelect); controls.appendChild(filterLabel);
+          const brightnessLabel = document.createElement("label"); brightnessLabel.textContent = "Brilho";
+          const brightness = document.createElement("input"); brightness.type = "range"; brightness.min = "50"; brightness.max = "150"; brightness.value = String(mediaEdits[index].brightness); brightness.setAttribute("aria-label", "Ajustar brilho da foto");
+          brightness.addEventListener("input", () => { mediaEdits[index].brightness = Number(brightness.value); updateEditorPreview(index); });
+          brightnessLabel.appendChild(brightness); controls.appendChild(brightnessLabel);
+          const name = document.createElement("div"); name.className = "muted"; name.style.fontSize = ".75rem"; name.textContent = file.name; controls.appendChild(name);
+          card.appendChild(controls);
+        }
+        preview.appendChild(card);
+        updateEditorPreview(index);
+      });
+    }
+
+    function applyImageEdits(file, edit) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Não foi possível ler a foto."));
+        reader.onload = () => {
+          image.onerror = () => reject(new Error("Não foi possível abrir a foto."));
+          image.onload = () => {
+            const sideways = Math.abs(edit.rotation % 180) === 90;
+            const canvas = document.createElement("canvas");
+            canvas.width = sideways ? image.naturalHeight : image.naturalWidth;
+            canvas.height = sideways ? image.naturalWidth : image.naturalHeight;
+            const context = canvas.getContext("2d");
+            context.save();
+            context.translate(canvas.width / 2, canvas.height / 2);
+            context.rotate(edit.rotation * Math.PI / 180);
+            const filters = { original: "none", vivid: "saturate(1.45) contrast(1.08)", grayscale: "grayscale(1)", sepia: "sepia(.75)" };
+            context.filter = `${filters[edit.filter] || "none"} brightness(${edit.brightness}%)`;
+            context.drawImage(image, -image.naturalWidth / 2, -image.naturalHeight / 2);
+            context.restore();
+            resolve({ type:"image", data:canvas.toDataURL("image/jpeg", .84), name:file.name });
+          };
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    $("postMedia").addEventListener("change", () => {
+      const files = Array.from($("postMedia").files || []);
+      if (files.length > 3) {
+        alert("Selecione no máximo 3 arquivos por publicação.");
+        $("postMedia").value = ""; selectedMediaFiles = []; mediaEdits = []; renderMediaEditors(); return;
+      }
+      if (files.reduce((sum, file) => sum + file.size, 0) > 2.5 * 1024 * 1024) {
+        alert("O tamanho total dos arquivos originais deve ser de até 2,5 MB.");
+        $("postMedia").value = ""; selectedMediaFiles = []; mediaEdits = []; renderMediaEditors(); return;
+      }
+      selectedMediaFiles = files;
+      mediaEdits = files.map(() => ({ rotation:0, filter:"original", brightness:100 }));
+      renderMediaEditors();
+    });
+
+    $("postForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const title = $("postTitle").value.trim();
+      const body = $("postBody").value.trim();
+      const location = $("postLocation").value.trim();
+      const files = selectedMediaFiles;
+      if (!title && !body && !location && !files.length) {
+        alert("Adicione uma legenda, um título, um local ou uma foto/vídeo para publicar.");
+        return;
+      }
+      if (files.length > 3 || files.reduce((sum, file) => sum + file.size, 0) > 2.5 * 1024 * 1024) {
+        alert("Selecione até 3 arquivos, com tamanho total de até 2,5 MB.");
+        return;
+      }
+      const submitButton = $("postForm").querySelector("button[type=submit]");
+      submitButton.disabled = true;
+      submitButton.textContent = "Publicando...";
+      try {
+        const media = await Promise.all(files.map((file, index) => file.type.startsWith("image/") ? applyImageEdits(file, mediaEdits[index]) : readMediaFile(file)));
+        const posts = getPosts();
+        posts.push({
+          id:"p_" + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+          userId:currentUser.id, author:currentUser.name, title, body, location, media,
+          category:$("postCategory").value, createdAt:Date.now(), likes:[], comments:[]
+        });
+        write(STORAGE_POSTS, posts);
+        $("postForm").reset();
+        selectedMediaFiles = []; mediaEdits = [];
+        $("mediaPreview").innerHTML = "";
+        $("charCount").textContent = "0/3000";
+        renderPosts();
+      } catch (error) {
+        alert("Não foi possível salvar a publicação. Tente arquivos menores.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "＋ Publicar";
+      }
+    });
+
+    $("searchInput").addEventListener("input", renderPosts);
+    $("categoryNav").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-category]");
+      if (!button) return;
+      activeCategory = button.dataset.category;
+      document.querySelectorAll(".nav-btn").forEach(item => item.classList.toggle("active", item === button));
+      renderPosts();
+    });
+
+    $("feed").addEventListener("click", (event) => {
+      const likeButton = event.target.closest("[data-like]");
+      const commentButton = event.target.closest("[data-comments]");
+      if (likeButton) {
+          const posts = getPosts(), post = posts.find(item => item.id === likeButton.dataset.like);
+        if (!post) return;
+        post.likes ||= [];
+        post.likes = post.likes.includes(currentUser.id) ? post.likes.filter(id => id !== currentUser.id) : [...post.likes, currentUser.id];
+        write(STORAGE_POSTS, posts); renderPosts();
+      }
+      if (commentButton) {
+          const id = commentButton.dataset.comments;
+        expandedComments.has(id) ? expandedComments.delete(id) : expandedComments.add(id);
+        renderPosts();
+      }
+    });
+
+    $("feed").addEventListener("submit", (event) => {
+      const form = event.target.closest("[data-comment-form]");
+      if (!form) return;
+      event.preventDefault();
+      const input = form.elements.comment, text = input.value.trim();
+      if (!text) return;
+      const posts = getPosts(), post = posts.find(item => item.id === form.dataset.commentForm);
+      if (!post) return;
+      post.comments ||= [];
+      post.comments.push({ id:"c_" + Date.now().toString(36), author:currentUser.name, text });
+      write(STORAGE_POSTS, posts); expandedComments.add(post.id); renderPosts();
+    });
+
+
+    seedPosts();
+    updateHeader();
+    renderPosts();
+  </script>
+</body>
+</html>
